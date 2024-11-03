@@ -1,0 +1,2 @@
+postrgresql_packages:
+  - name: postgresql

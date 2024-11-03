@@ -16,3 +16,12 @@
 
 - name: Reconfigure GitLab
   command: gitlab-ctl reconfigure
+
+- name: Local connection test
+  command: curl -I http://192.168.162.130
+  register: result
+  ignore_errors: yes
+
+- name: Display connection test
+  debug:
+    msg: "{{ result.stdout_lines }}"
