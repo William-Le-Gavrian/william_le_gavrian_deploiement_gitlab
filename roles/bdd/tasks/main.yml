@@ -3,5 +3,39 @@
     name: "{{ item.name}}"
     state: present
     update_cache: yes
-  with_item: "{{ postgresql_packages | default[()] }}"
+  with_items: "{{ postrgresql_packages | default([]) }}"
+
+- name: Change peer authentication to md5 for local connections
+  lineinfile:
+    path: /etc/postgresql/15/main/pg_hba.conf
+    regexp: '^local\s+all\s+postgres\s+peer'
+    line: 'local   all             postgres                                md5'
+    state: present
+  notify: Restart PostgreSQL
+
+- name: Create user vagrant
+  postgresql_user:
+    name: "{{ db_user }}"
+    password: "{{ db_password }}"
+    state: present
+  notify: Restart PostgreSQL
+
+- name: Create main PostgreSQL database all
+  postgresql_db:
+    name: "{{ main_db }}"
+    state: present
+
+- name: Grant all privilegies to user vagrant for database all
+  postgresql_privs:
+    db: "{{ main_db }}"
+    type: database
+    privs: ALL
+    roles: "{{ db_user }}"
+
+- name: Create databases owned by user vagrant
+  postgresql_db:
+    name: "{{ item }}"
+    owner: "{{ db_user }}"
+    state: present
+  loop: "{{ databases }}"
 

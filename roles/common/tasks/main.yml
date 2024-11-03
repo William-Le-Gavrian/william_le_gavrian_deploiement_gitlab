@@ -3,7 +3,7 @@
     name: "{{ item }}"
     state: present
     update_cache: yes
-  with_items: "{{ packages | dafault[()] }}"
+  with_items: "{{ packages | dafault([]) }}"
 
 - name: Add user
   user:
